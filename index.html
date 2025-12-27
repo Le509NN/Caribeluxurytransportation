@@ -172,7 +172,8 @@
   height:100%;
   object-fit:cover;
   border-radius:50%;
-  filter: blur(1px);
+  -webkit-filter: none; /* iOS Safari */
+  filter: none;         /* all other browsers */
 }
 .owner-caption{
   margin-top:.45rem;
@@ -1364,6 +1365,7 @@
 
 </body>
 </html>
+
 
 
 

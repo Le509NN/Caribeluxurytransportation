@@ -130,6 +130,7 @@
       display:flex; align-items:center; gap:.5rem;
       margin-bottom:1rem;
     }
+
     .eyebrow::before{
       content:""; width:32px; height:1px;
       background: linear-gradient(90deg, var(--clr-gold-soft), transparent);
@@ -143,6 +144,71 @@
       text-transform:uppercase;
       margin-bottom:1.25rem;
     }
+/* Owner avatar next to hero title */
+.hero-title-wrap{
+  display:flex;
+  align-items:center;
+  gap:1.25rem;
+}
+
+.owner-avatar{
+  width:96px;
+  height:96px;
+  border-radius:50%;
+  padding:2px;
+  background: linear-gradient(
+    135deg,
+    var(--clr-gold),
+    var(--clr-primary-red)
+  );
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.15),
+    0 18px 40px rgba(0,0,0,0.8);
+  flex-shrink:0;
+}
+
+.owner-avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:50%;
+  filter: blur(.4px);
+}
+.owner-caption{
+  margin-top:.45rem;
+  text-align:center;
+}
+
+.owner-name{
+  display:block;
+  font-size:.78rem;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--clr-white);
+}
+
+.owner-title{
+  display:block;
+  font-size:.65rem;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--clr-gold-soft);
+}
+
+
+/* Mobile behavior */
+@media (max-width: 600px){
+  .hero-title-wrap{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .owner-avatar{
+    width:82px;
+    height:82px;
+  }
+}
+
     .hero h1 .highlight{
       background: linear-gradient(120deg, var(--clr-gold), var(--clr-primary-red));
       -webkit-background-clip:text;
@@ -805,12 +871,28 @@
       <section class="hero" id="services">
         <div class="container hero-grid">
           <div>
-            <div class="eyebrow">Private and confortable ride </div>
+            <div class="eyebrow">Private and comfortable ride</div>
 
-            <h1>
-              Arrive in <span class="highlight">comfort</span><br />
-              Leave a <span class="highlight">signature</span>
-            </h1>
+<div class="hero-title-wrap">
+
+  <div class="owner-block">
+    <div class="owner-avatar">
+      <img src="images/owner.png" alt="B.Paul, CEO">
+    </div>
+
+    <div class="owner-caption">
+      <span class="owner-name">B.Paul</span>
+      <span class="owner-title">CEO</span>
+    </div>
+  </div>
+
+  <h1>
+    Arrive in <span class="highlight">comfort</span><br />
+    Leave a <span class="highlight">signature</span>
+  </h1>
+
+</div>
+
 
             <p class="hero-lede">
               Caribe Luxury Transportation provides premium black SUV and executive chauffeur service
@@ -1004,7 +1086,7 @@
             </div>
 
             <p class="fleet-tagline">
-              Every ride with Caribe is designed to feel seamless from the moment you book to drop-off at your final destination.
+              Every ride with Caribe is designed to feel seamless—from the moment you book to drop-off at your final destination.
               Our professional chauffeurs handle the logistics while you stay focused on what matters.
             </p>
 
@@ -1056,7 +1138,8 @@
               </div>
             </div>
 
-            <form>
+            <form id="rideForm">
+
               <div class="form-field">
                 <label for="name">Full name</label>
                 <input id="name" type="text" placeholder="Enter your name">
@@ -1123,7 +1206,7 @@
             <div class="hotline">
               Prefer to speak with someone now?<br>
               Call or text our reservation line:<br>
-              <strong>(407) 408-3254</strong>
+              <strong>(000) 000-0000</strong>
             </div>
           </aside>
         </div>
@@ -1169,10 +1252,12 @@
        Example: "images/car4.png"
     ------------------------------------------------------- */
     const sliderImages = [
-      "images/car1.png",
-      "images/car2.png",
-      "images/car3.png"
-    ];
+  "images/car1.png",
+  "images/car2.png",
+  "images/car3.png",
+  "images/gmc.jpg",
+  "images/gmc1.jpg"
+];
 
     let slideIndex = 0;
     let slideTimer = null;
@@ -1216,6 +1301,71 @@
       startAuto();
     });
   </script>
+  // ------------------------------------
+  // existing JS code (do not remove)
+  // ------------------------------------
+
+  /* ===== BOOKING FORM → EMAIL CONNECTION ===== */
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getFirestore, addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+  // 🔐 YOUR Firebase config (paste EXACT values from Firebase Console)
+  const firebaseConfig = {
+    apiKey: "AIzaSyAFVcw2Opebyd_eMHS6DMeoC-tFiWvwu2o",
+    authDomain: "caribe-luxury-transportation.firebaseapp.com",
+    projectId: "caribe-luxury-transportation",
+    storageBucket: "caribe-luxury-transportation.firebasestorage.app",
+    messagingSenderId: "187588257562",
+    appId: "1:187588257562:web:03da34e7df44fee389eea3"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Hook into your EXISTING form
+  const form = document.getElementById("rideForm");
+
+  if (!form) {
+    console.error("rideForm not found in DOM");
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+
+    const booking = {
+      name: document.getElementById("name").value.trim(),
+      phone: document.getElementById("phone").value.trim(),
+      email: document.getElementById("email").value.trim(),
+      package: document.getElementById("package").value,
+
+      pickupDate: document.getElementById("pickup-date").value,
+      pickupTime: document.getElementById("pickup-time").value,
+      pickupLocation: document.getElementById("pickup-location").value.trim(),
+      dropoffLocation: document.getElementById("dropoff-location").value.trim(),
+      notes: document.getElementById("notes").value.trim(),
+
+      status: "new",
+      source: "website",
+      createdAt: serverTimestamp()
+    };
+
+    try {
+      await addDoc(collection(db, "bookings"), booking);
+      alert("Booking request sent successfully. We will contact you shortly.");
+      form.reset();
+    } catch (error) {
+      console.error("Booking submission failed:", error);
+      alert("There was an issue sending your request. Please try again.");
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  });
+</script>
+
 </body>
 </html>
-
